@@ -129,7 +129,7 @@ if __name__ == '__main__':
 	s.connect(('8.8.8.8', 0))
 	ip = s.getsockname()[0]
 	print(ip)
-	sniff(iface = interface, prn = cookie_sniff ,filter = "tcp port 80")# and src host not "+ip)
+	sniff(iface = interface, prn = cookie_sniff ,filter = "tcp port 80 and src host not "+ip)
 
 
 
