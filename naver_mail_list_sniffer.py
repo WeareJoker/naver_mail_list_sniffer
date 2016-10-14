@@ -119,11 +119,11 @@ if __name__ == '__main__':
 			sys.exit()
 
 	with open("MAIL_LIST.txt", "wt") as f:
-		f.write("This is userName userMail to_email to_name "
+		f.write("userName userMail to_email to_name "
 		"subject from_email from_name received_time\n")
 
 	with open("MAIL_SIZE.txt", "wt") as f:
-		f.write("This is userName userMail Size folderName unreadCount totalCount\n")
+		f.write("userName userMail Size folderName unreadCount totalCount\n")
 
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
