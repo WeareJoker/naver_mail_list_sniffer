@@ -1,0 +1,2 @@
+This is userName userMail Size folderName unreadCount totalCount
+이재우 inparadoxx@naver.com 1.1GB "받은메일함" 39 324

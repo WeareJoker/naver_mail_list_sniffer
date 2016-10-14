@@ -112,24 +112,37 @@ def mail_json_sniff(COOKIE_HASH_TABLE):
 
 
 if __name__ == '__main__':
-	if len(sys.argv) != 2:
-		print("USAGE : thisfile.py \"interface\"")
-		sys.exit()
+	if (len(sys.argv) != 2):
+		if sys.argv[1] not in ["live", "pcap"]:
+			print("Input Condition 'live' or 'pcap'")
+			print("USAGE : %s Condition - live or pcap" % sys.argv[0])
+			sys.exit()
 
 	with open("MAIL_LIST.txt", "wt") as f:
 		f.write("This is userName userMail to_email to_name "
-			"subject from_email from_name received_time\n")
-
+		"subject from_email from_name received_time\n")
 
 	with open("MAIL_SIZE.txt", "wt") as f:
 		f.write("This is userName userMail Size folderName unreadCount totalCount\n")
 
-	interface = sys.argv[1]
+
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.connect(('8.8.8.8', 0))
 	ip = s.getsockname()[0]
 	print(ip)
-	sniff(iface = interface, prn = cookie_sniff ,filter = "tcp port 80 and src host not "+ip)
+
+	if(sys.argv[1]=="live"):
+		sniff(iface= "tap0", prn=cookie_sniff, filter = "tcp port 80 and src host not " + ip)
+	elif(sys.argv[1]=="pcap"):
+		filename = raw_input("Input File Name : ")
+		now_path = os.path.dirname(os.path.abspath(__file__))
+		pcap_path = os.path.join(now_path, filename)
+		pcap = rdpcap(pcap_path)
+	for packet in pcap:
+		cookie_sniff(packet)
+
+
+	#sniff(iface = interface, prn = cookie_sniff ,filter = "tcp port 80 and src host not "+ip)
 
 
 
